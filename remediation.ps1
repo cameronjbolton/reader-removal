@@ -1,3 +1,22 @@
+<#
+.SYNOPSIS
+    Remediation script: removes EVERY 32-bit Adobe Acrobat / Acrobat Reader
+    install (any version), then installs the unified 64-bit Acrobat if no
+    64-bit Acrobat is already present. Sets FeatureLockDown keys so the
+    unified app runs in Reader mode without forced sign-in (licensed users
+    can still sign in to unlock Standard/Pro).
+
+.NOTES
+    - Runs as SYSTEM via Intune Proactive Remediations.
+    - Logs to C:\ProgramData\AcrobatRemediation\.
+    - 32-bit installs are identified by their registration under WOW6432Node.
+    - The unified installer URL is version-independent (always latest), so no
+      monthly maintenance is required in this script.
+#>
+
+# ============================================================
+# CONFIG
+# ============================================================
 $InstallerUrl  = "https://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_x64_WWMUI.zip"
 $LogDir        = "C:\ProgramData\AcrobatRemediation"
 $KillProcesses = $true
@@ -8,11 +27,6 @@ $LogFile = Join-Path $LogDir ("Remediate32-{0:yyyyMMdd-HHmmss}.log" -f (Get-Date
 function Write-Log ($msg) {
     Add-Content -Path $LogFile -Value ("{0:u}  {1}" -f (Get-Date), $msg)
     Write-Output $msg
-}
-
-if (-not [Environment]::Is64BitOperatingSystem) {
-    Write-Log "32-bit OS detected: unified 64-bit Acrobat cannot install here. Exiting for manual handling."
-    exit 1
 }
 
 $Wow64Root  = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
@@ -145,7 +159,7 @@ if ($removedAny -and $x64Installs.Count -eq 0) {
 
         Write-Log "Installing unified Acrobat 64-bit (silent)..."
         $proc = Start-Process $setup.FullName `
-            -ArgumentList "--silent --INSTALLLEVEL=2 --msi=`"EULA_ACCEPT=YES DISABLEDESKTOPSHORTCUT=1`"" `
+            -ArgumentList "/sAll /rs /msi EULA_ACCEPT=YES DISABLEDESKTOPSHORTCUT=1" `
             -Wait -PassThru
         Write-Log "Installer exit code: $($proc.ExitCode)"
         if ($proc.ExitCode -notin 0,3010) { throw "Install failed with exit code $($proc.ExitCode)." }

@@ -3,23 +3,7 @@ try {
     # On x64 Windows, 32-bit applications register under WOW6432Node.
     $Wow64Root   = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
     $NativeRoot  = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
-    $Is64BitOS   = [Environment]::Is64BitOperatingSystem
 
-    if (-not $Is64BitOS) {
-        # On a 32-bit OS every install is 32-bit and lives in the native hive,
-        # but the unified replacement is 64-bit only — flag for manual handling.
-        $legacy = Get-ChildItem $NativeRoot -ErrorAction SilentlyContinue | ForEach-Object {
-            $p = Get-ItemProperty $_.PSPath -ErrorAction SilentlyContinue
-            if ($p.DisplayName -match '^Adobe (Acrobat|Reader)' -and
-                $p.DisplayName -notmatch 'Refresh Manager|Genuine|Creative Cloud') { $p.DisplayName }
-        }
-        if ($legacy) {
-            Write-Output "Non-compliant: 32-bit OS with Acrobat installed ($($legacy -join '; ')) - needs manual review, 64-bit unified app cannot install."
-            exit 1
-        }
-        Write-Output "Compliant: 32-bit OS, no Acrobat installed."
-        exit 0
-    }
 
     # --- 32-bit Acrobat/Reader detection (any version) ---
     $x86Installs = @()

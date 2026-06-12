@@ -126,7 +126,7 @@ if ($removedAny -and $x64Installs.Count -eq 0) {
 
         Write-Log "Installing unified Acrobat 64-bit (silent)..."
         $proc = Start-Process $setup.FullName `
-            -ArgumentList "--sAll --INSTALLLEVEL=2 --msi=`"EULA_ACCEPT=YES DISABLEDESKTOPSHORTCUT=1`"" `
+            -ArgumentList "/sAll /rs /msi EULA_ACCEPT=YES DISABLEDESKTOPSHORTCUT=1" `
             -Wait -PassThru
         Write-Log "Installer exit code: $($proc.ExitCode)"
         if ($proc.ExitCode -notin 0,3010) { throw "Install failed with exit code $($proc.ExitCode)." }

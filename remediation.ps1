@@ -41,7 +41,7 @@ function Set-AcrobatPolicyKeys {
     Write-Log "Set FeatureLockDown keys: bIsSCReducedModeEnforcedEx=1, cIPM\bDontShowMsgWhenViewingDoc=0"
 }
 
-x86Installs = @(Get-AcrobatInstalls $Wow64Root  'x86')
+$x86Installs = @(Get-AcrobatInstalls $Wow64Root  'x86')
 $x64Installs = @(Get-AcrobatInstalls $NativeRoot 'x64')
 
 Write-Log "32-bit Acrobat installs: $($x86Installs.Count)"

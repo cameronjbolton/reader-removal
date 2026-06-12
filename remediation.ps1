@@ -9,11 +9,6 @@ function Write-Log ($msg) {
     Write-Output $msg
 }
 
-if (-not [Environment]::Is64BitOperatingSystem) {
-    Write-Log "32-bit OS detected: unified 64-bit Acrobat cannot install here. Exiting for manual handling."
-    exit 1
-}
-
 $Wow64Root  = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
 $NativeRoot = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
 

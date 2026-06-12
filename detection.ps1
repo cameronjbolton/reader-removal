@@ -1,4 +1,3 @@
-
 try {
     # On x64 Windows, 32-bit applications register under WOW6432Node.
     $Wow64Root   = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
